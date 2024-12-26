@@ -1,0 +1,216 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+	
+	<servlet>
+		<servlet-name>SignInServlet</servlet-name>
+		<servlet-class>SignInServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>SignInServlet</servlet-name>
+        <url-pattern>/SignInServlet</url-pattern>
+    </servlet-mapping>
+	
+		<servlet>
+		<servlet-name>SignUpServlet</servlet-name>
+		<servlet-class>SignUpServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>SignUpServlet</servlet-name>
+        <url-pattern>/SignUpServlet</url-pattern>
+    </servlet-mapping>
+	
+		<servlet>
+		<servlet-name>VerifyEmailServlet</servlet-name>
+		<servlet-class>VerifyEmailServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>VerifyEmailServlet</servlet-name>
+        <url-pattern>/VerifyEmailServlet</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>FetchUsersServlet</servlet-name>
+		<servlet-class>FetchUsersServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>FetchUsersServlet</servlet-name>
+        <url-pattern>/FetchUsersServlet</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SendMessageServlet</servlet-name>
+		<servlet-class>SendMessageServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>SendMessageServlet</servlet-name>
+        <url-pattern>/sendMessage</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SendGroupMessageServlet</servlet-name>
+		<servlet-class>SendGroupMessageServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>SendGroupMessageServlet</servlet-name>
+        <url-pattern>/sendGroupMessage</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>FetchMessageServlet</servlet-name>
+		<servlet-class>FetchMessageServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>FetchMessageServlet</servlet-name>
+        <url-pattern>/fetchMessages</url-pattern>
+    </servlet-mapping>
+	
+		<servlet>
+		<servlet-name>EditMessageServlet</servlet-name>
+		<servlet-class>EditMessageServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>EditMessageServlet</servlet-name>
+        <url-pattern>/editMessage</url-pattern>
+    </servlet-mapping>
+	
+<servlet>
+		<servlet-name>DeleteMessageServlet</servlet-name>
+		<servlet-class>DeleteMessageServlet</servlet-class>
+</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>DeleteMessageServlet</servlet-name>
+        <url-pattern>/deleteMessage</url-pattern>
+    </servlet-mapping>
+	
+<servlet>
+		<servlet-name>MarkAsReadServlet</servlet-name>
+		<servlet-class>MarkAsReadServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>MarkAsReadServlet</servlet-name>
+        <url-pattern>/markAsRead</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SignOutServlet</servlet-name>
+		<servlet-class>SignOutServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>SignOutServlet</servlet-name>
+        <url-pattern>/SignOutServlet</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>CheckOnlineStatusServlet</servlet-name>
+		<servlet-class>CheckOnlineStatusServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>CheckOnlineStatusServlet</servlet-name>
+        <url-pattern>/checkOnlineStatus</url-pattern>
+    </servlet-mapping>
+	
+<servlet>
+    <servlet-name>NotificationServlet</servlet-name>
+    <servlet-class>NotificationServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>NotificationServlet</servlet-name>
+    <url-pattern>/NotificationServlet</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>MarkNotificationReadServlet</servlet-name>
+    <servlet-class>MarkNotificationReadServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MarkNotificationReadServlet</servlet-name>
+    <url-pattern>/MarkNotificationReadServlet</url-pattern>
+</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreateGroupChatServlet</servlet-name>
+		<servlet-class>CreateGroupChatServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>CreateGroupChatServlet</servlet-name>
+		<url-pattern>/CreateGroupChatServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ExitGroupServlet</servlet-name>
+		<servlet-class>ExitGroupServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>ExitGroupServlet</servlet-name>
+		<url-pattern>/ExitGroupServlet</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
+		<servlet-name>DownloadAttachmentServlet</servlet-name>
+		<servlet-class>DownloadAttachmentServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DownloadAttachmentServlet</servlet-name>
+		<url-pattern>/downloadAttachment</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>RemoveGroupNotificationServlet</servlet-name>
+		<servlet-class>RemoveGroupNotificationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RemoveGroupNotificationServlet</servlet-name>
+		<url-pattern>/removeGroupNotification</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>AddMembersServlet</servlet-name>
+		<servlet-class>AddMembersServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AddMembersServlet</servlet-name>
+		<url-pattern>/AddMembersServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>AddMembersToGroupServlet</servlet-name>
+		<servlet-class>AddMembersToGroupServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AddMembersToGroupServlet</servlet-name>
+		<url-pattern>/AddMembersToGroupServlet</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
+		<servlet-name>FetchGroupsServlet</servlet-name>
+		<servlet-class>FetchGroupsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FetchGroupsServlet</servlet-name>
+		<url-pattern>/FetchGroupsServlet</url-pattern>
+	</servlet-mapping>
+</web-app>
+	
