@@ -7,7 +7,6 @@
         return;
     }
 
-    List<String[]> notifications = (List<String[]>) request.getAttribute("notifications");
 %>
 
 <!DOCTYPE html>
@@ -15,7 +14,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <title>Notifications</title>
     <style>
         * {
             margin: 0;
@@ -99,45 +99,50 @@
 
     <div class="notification-container">
         <h2>Notifications</h2>
-        <% 
-        if (notifications != null && !notifications.isEmpty()) {
-            for (String[] notification : notifications) {
-				String messageId = "", sender = "", message = "", groupName = "", groupId = "";
-				if(notification.length == 3) {
-					System.out.println("qqqq "+Arrays.toString(notification));
-					messageId = notification[0];
-					sender = notification[1];
-					message = notification[2];
-        %>
-        <div class="notification-item" onclick="markAsReadAndOpenChat('<%= sender %>', '<%= messageId %>')">
-            <strong><%= sender %></strong>: <%= message %>
-        </div>
-        <% 
-            } else {
-				 groupName = notification[0];
-				 groupId = notification[0] + ":" + notification[1];
-				 messageId = notification[2];
-				 sender = notification[3];
-				 message = notification[4];
-		%>
-		 <div class="notification-item" onclick="markAsReadAndOpenChat('<%= sender %>' , '<%= messageId%>', '<%= groupId %>')">
-            <strong><%= groupName %></strong>: <%= sender %> : <%= message %>
-        </div>
-		<%
-			   }
-			}
-        } else {
-        %>
-        <p class="no-notifications">No notifications.</p>
-        <% 
-        }
-        %>
+		
+		<div id="notifications"></div>
+		
 		 <button class="back-btn">
-        <a href="welcome.jsp">Back</a>
-    </button> 
+			<a href="welcome.jsp">Back</a>
+		</button> 
     </div>
 
     <script>
+		function fetchNotifications() {
+            $.ajax({
+                url: 'NotificationServlet',
+                method: 'GET',
+                dataType: 'json',
+                success: function (notifications) {
+                    const notificationsContainer = $("#notifications");
+                    notificationsContainer.empty(); 
+
+                    if (notifications.length === 0) {
+                        notificationsContainer.append('<p class="no-notifications">No notifications.</p>');
+                    } else {
+                        notifications.forEach(function(notification) {
+                            let notificationHtml = '';
+                            if (notification.length === 3) {
+                                notificationHtml = 
+                                    '<div class="notification-item" onclick="markAsReadAndOpenChat(\'' + notification[1] + '\', \'' + notification[0] + '\')">' +
+                                    '<strong>' + notification[1] + '</strong>: ' + notification[2] +
+                                    '</div>';
+                            } else {
+                                notificationHtml = 
+                                    '<div class="notification-item" onclick="markAsReadAndOpenChat(\'' + notification[3] + '\', \'' + notification[2] + '\', \'' + notification[0] + ':' + notification[1] + '\')">' +
+                                    '<strong>' + notification[0] + '</strong>: ' + notification[3] + ' : ' + notification[4] +
+                                    '</div>';
+                            }
+                            notificationsContainer.append(notificationHtml);
+                        });
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching notifications:', err);
+                }
+            });
+        }
+
         function markAsReadAndOpenChat(sender, messageId, groupId) {
 			console.log(groupId);
 			
@@ -165,6 +170,8 @@
 			}
 			window.location.href = "startchat.jsp?recipient=" + sender;
         }
+		
+		setInterval(fetchNotifications, 1000);
     </script>
 </body>
 </html>

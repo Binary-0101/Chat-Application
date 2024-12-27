@@ -4,6 +4,7 @@ import io.lettuce.core.api.sync.RedisCommands;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.*;
+import com.google.gson.*;
 
 public class NotificationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -16,10 +17,12 @@ public class NotificationServlet extends HttpServlet {
         }
 
         List<String[]> notifications = getNotifications(email);
-
-        request.setAttribute("notifications", notifications);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("notification.jsp");
-        dispatcher.forward(request, response);
+		
+		Gson gson = new Gson();
+        String json = gson.toJson(notifications);
+		
+		response.setContentType("application/json");
+        response.getWriter().write(json);
     }
 
     private List<String[]> getNotifications(String email) {

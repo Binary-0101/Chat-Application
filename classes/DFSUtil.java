@@ -13,13 +13,29 @@ public class DFSUtil {
     private static final int REPLICATION_FACTOR = 3;
 
     static {
-        for (int i = 0; i < NUM_SHARDS; i++) {
-            new File(DFS_GROUP_MEMBERS + "shard" + i).mkdirs();
-            new File(DFS_ONE_ONE_MESSAGES + "shard" + i).mkdirs();
-            new File(DFS_GROUP_MESSAGES + "shard" + i).mkdirs();
-            new File(DFS_ATTACHMENTS + "shard" + i).mkdirs();
-			new File(DFS_ONLINE_STATUS + "shard" + i).mkdirs();
-			new File(DFS_NOTIFICATIONS + "shard" + i).mkdirs();
+        try {
+			System.out.println("Static block executed");
+            for (int i = 0; i < NUM_SHARDS; i++) {
+                createDirectoryIfNotExists(DFS_GROUP_MEMBERS + "shard" + i);
+                createDirectoryIfNotExists(DFS_ONE_ONE_MESSAGES + "shard" + i);
+                createDirectoryIfNotExists(DFS_GROUP_MESSAGES + "shard" + i);
+                createDirectoryIfNotExists(DFS_ATTACHMENTS + "shard" + i);
+                createDirectoryIfNotExists(DFS_ONLINE_STATUS + "shard" + i);
+                createDirectoryIfNotExists(DFS_NOTIFICATIONS + "shard" + i);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	
+	private static void createDirectoryIfNotExists(String path) {
+        File dir = new File(path);
+		System.out.println("Trying to create directory: " + dir.getAbsolutePath());
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (!created) {
+                System.err.println("Failed to create directory: " + path);
+            }
         }
     }
 
@@ -106,14 +122,24 @@ public class DFSUtil {
 	}
 	
     public static void storeGroup(String redisGroupKey, String groupName, List<String> groupMembers) {
+		System.out.println("came for store group");
         String groupContent = "Group Key: " + redisGroupKey + "\n" + String.join("\n", groupMembers);
         List<Integer> shards = getReplicationShards(groupName);
 
         for (int shard : shards) {
             String filePath = DFS_GROUP_MEMBERS + "shard" + shard + "/" + groupName + ".txt";
-            writeFile(filePath, groupContent);
+            writeFileForGroup(filePath, groupContent);
         }
     }
+	
+	public static void writeFileForGroup(String filePath, String content) {
+		try (FileWriter writer = new FileWriter(filePath, false)) {
+			writer.write(content);
+		} catch (IOException e) {
+			System.err.println("Error writing to file: " + filePath);
+			e.printStackTrace();
+		}
+	}
 	
 	public static List<String> fetchNotifications(String email) {
 		List<String> notifications = new ArrayList<>();

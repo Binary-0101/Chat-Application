@@ -4,7 +4,6 @@ import java.io.*;
 import io.lettuce.core.api.sync.RedisCommands;
 import com.google.gson.*;
 import java.util.*;
-import java.text.SimpleDateFormat;
 
 public class EditMessageServlet extends HttpServlet {
     private static final Gson gson = new Gson();
@@ -21,8 +20,6 @@ public class EditMessageServlet extends HttpServlet {
 		String groupId = editData.groupId;
 		System.out.println("Group ka id" + groupId);
         RedisCommands<String, String> redisCommands = RedisUtil.getConnection();
-		
-		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		
 		if(groupId != null && !groupId.isEmpty() && !groupId.equals("null")) {
 			List<String> groupMembers = redisCommands.lrange(groupId, 0, -1);
@@ -72,11 +69,11 @@ public class EditMessageServlet extends HttpServlet {
 			if (!senderMessages.isEmpty()) {
 				for (int i = 0; i < senderMessages.size(); i++) {
 					String msg = senderMessages.get(i);
-					String[] parts = msg.split(": ", 5);
+					String[] parts = msg.split(": ", 4);
 
-					if (parts.length == 5 && parts[0].equals(messageId)) {
+					if (parts.length == 4 && parts[0].equals(messageId)) {
 						if (parts[1].equals(sender)) {
-							senderMessages.set(i, messageId + ": " + sender + ": " + newText + ": " + parts[3] + ": " + timestamp);
+							senderMessages.set(i, messageId + ": " + sender + ": " + newText + ": " + parts[3]);
 							senderUpdated = true;
 							break;
 						}
@@ -87,11 +84,11 @@ public class EditMessageServlet extends HttpServlet {
 			if (!recipientMessages.isEmpty()) {
 				for (int i = 0; i < recipientMessages.size(); i++) {
 					String msg = recipientMessages.get(i);
-					String[] parts = msg.split(": ", 5);
+					String[] parts = msg.split(": ", 4);
 
-					if (parts.length == 5 && parts[0].equals(messageId)) {
+					if (parts.length == 4 && parts[0].equals(messageId)) {
 						if (parts[1].equals(sender)) {
-							recipientMessages.set(i, messageId + ": " + sender + ": " + newText + ": " + parts[3] + ": "+ timestamp);
+							recipientMessages.set(i, messageId + ": " + sender + ": " + newText + ": " + parts[3]);
 							recipientUpdated = true;
 							break;
 						}
@@ -102,12 +99,12 @@ public class EditMessageServlet extends HttpServlet {
 			if (senderUpdated) {
 				redisCommands.del(senderKey);
 				redisCommands.rpush(senderKey, senderMessages.toArray(new String[0]));
-				//DFSUtil.editMessageInFile(sender, recipient, messageId, newText);
+				DFSUtil.editMessageInFile(sender, recipient, messageId, newText);
 			}
 			if (recipientUpdated) {
 				redisCommands.del(recipientKey);
 				redisCommands.rpush(recipientKey, recipientMessages.toArray(new String[0]));
-				//DFSUtil.editMessageInFile(sender, recipient, messageId, newText);
+				DFSUtil.editMessageInFile(sender, recipient, messageId, newText);
 			}
 
 			if (senderUpdated && recipientUpdated) {

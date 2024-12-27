@@ -148,7 +148,6 @@
             background-color: #4A628A; 
         }
 
-        /* Exit Group Button */
         button {
             padding: 10px;
             background-color: #2A3663;
@@ -187,9 +186,20 @@
     </style>
 </head>
 <body>
+<div id="successMessage" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; font-size: 16px; z-index: 1000; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"></div>
+
     <div class="chat-container">
         <% if (groupId != null) { %>
-            <div class="chat-header">Group: <%= groupName %> </div>
+            <div class="chat-header">Group: <%= groupName %> 
+			 <form action="groupDetails.jsp" method="get">
+				<input type="hidden" name="groupId" value="<%= groupId %>">
+				<button type="submit">View Group Members</button>
+			</form>
+			<form action="AddMembersServlet">
+				<input type="hidden" name="groupId" value="<%= groupId %>">
+				<button type="submit">Add Members</button>
+			</form>
+			</div>
             <span id="onlineStatus" style="font-size: 0.9em; color: green;"></span>
         <% } else { %>
             <div class="chat-header">Chat with <%= recipient %></div>
@@ -209,7 +219,7 @@
         </form>
         
 		 <% if (groupId != null) { %>
-        <button onclick="leaveGroup('<%= groupId %>', '<%= groupName %>')">Exit Group</button>
+		 <button id="exitGroupBtn" data-groupid="<%= groupId %>" data-groupname="<%= groupName %>">Exit Group</button>
 		 <% }
         %>
 		
@@ -247,7 +257,6 @@
         };
 		
 		const messagesContainer = document.getElementById("chatMessages");
-		let lastFetchedTime = null;
 		
         const fetchMessages = async () => {
 			
@@ -255,10 +264,10 @@
 				let url;
 				
 				if (recipient && recipient.trim() !== "") {
-					url = `fetchMessages?recipient=${recipient}&lastFetchedTime=`+ lastFetchedTime;
+					url = `fetchMessages?recipient=${recipient}`;
 					console.log("url ", url);
 				} else {
-					url = `fetchMessages?groupId=${groupId}&lastFetchedTime=` + lastFetchedTime;
+					url = `fetchMessages?groupId=${groupId}`;
 				}
 
                 const response = await fetch(url);
@@ -266,6 +275,8 @@
                     console.error("Failed to fetch messages");
                     return;
                 }
+				
+				console.log(response);
 
                 const messages = await response.json();
 				const existingElements = new Map();
@@ -277,6 +288,7 @@
 				const newDisplayedMessageIds = new Set();
 								
                 messages.forEach(msg => {
+					if(msg === null || msg === '') return;
 					const uniqueId = msg.attachmentId || msg.messageId;
 					newDisplayedMessageIds.add(uniqueId);
 					
@@ -294,9 +306,9 @@
 						//console.log("contentElement.textContent ", contentElement.textContent);
 						//console.log("msg.text ", msg.text);
 						
-						if (!msg.text.includes("[attachment]") && contentElement && contentElement.textContent !== msg.sender + ":" + msg.text + ":" + msg.timestamp) {
+						if (!msg.text.includes("[attachment]") && contentElement && contentElement.textContent !== msg.sender + ":" + msg.text) {
 							console.log("eidted");
-							contentElement.textContent = msg.sender + ":" + msg.text + ":" + msg.timestamp; // Update message content
+							contentElement.textContent = msg.sender + ":" + msg.text; // Update message content
 						}
 
 						if (statusElement) {
@@ -389,7 +401,7 @@
 
                 const messageContent = document.createElement("div");
 				messageContent.className = "content";
-                messageContent.textContent = msg.sender + ":" + msg.text + ":" + msg.timestamp;
+                messageContent.textContent = msg.sender + ":" + msg.text;
                 messageContent.style.display = "inline-block"; // Ensures the content and status are on the same line
                 messageContent.style.marginRight = "8px"; // Add spacing between text and status
 
@@ -400,7 +412,7 @@
 				const statusSpan = document.createElement("span");
                 statusSpan.className = "status";
                 statusSpan.textContent = status;
-				                messageDiv.appendChild(statusSpan);
+				 messageDiv.appendChild(statusSpan);
 
 				
 				if(msg.type === "sent" && msg.text !== "null" && !msg.text.includes("[attachment]")) {
@@ -428,11 +440,6 @@
 				}
 				
 			}
-				const messageTimestamp = msg.timestamp;
-				if(!lastFetchedTime || new Date(messageTimestamp) > new Date(lastFetchedTime)) {
-					lastFetchedTime = messageTimestamp;
-					console.log("lastFetchedTime", lastFetchedTime);
-				}
 			});
 			
 			existingElements.forEach((el, uniqueId) => {
@@ -591,11 +598,39 @@ const editMessage = (groupId, messageId, text, sender) => {
 			console.log("Recipient is null, skipping online status check.");
 		}
 		
-		setInterval(fetchMessages, 5000);
+		setInterval(fetchMessages, 200);
 		
 		window.addEventListener("unload", () => {
 			navigator.sendBeacon("SignOutServlet");
 		});
+		
+		$(document).ready(function () {
+			$("button#exitGroupBtn").click(function () {
+				var groupId = $(this).data("groupid");
+				var groupName = $(this).data("groupname");
+
+				$.ajax({
+					url: 'ExitGroupServlet',
+					type: 'POST',
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						groupId: groupId,
+						groupName: groupName
+					}),
+					success: function (response) {
+						$('#successMessage').text(response).fadeIn();
+
+						setTimeout(function () {
+							$('#successMessage').fadeOut();
+							window.location.href = "welcome.jsp"; 
+						}, 2000);
+					},
+					error: function (xhr, status, error) {
+						console.error("Error exiting the group:", error);
+					}
+				});
+			});
+    });
     </script>
 </body>
 </html>

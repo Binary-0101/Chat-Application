@@ -21,7 +21,6 @@ public class SendMessageServlet extends HttpServlet {
         Part attachment = request.getPart("attachment");
 				
 		String messageId = UUID.randomUUID().toString();
-		long timestamp = System.currentTimeMillis(); // in millisec
 		System.out.println("came to one-one");
 
         RedisCommands<String, String> redisCommands = RedisUtil.getConnection();
@@ -50,20 +49,20 @@ public class SendMessageServlet extends HttpServlet {
 			
 			String attachmentId = UUID.randomUUID().toString();
 			
-            String attachmentMessage = "[attachment]" + attachmentId + "|"+ sender + "|" + fileName + "|" + file.getAbsolutePath() + "|unread|" + mimeType + "|" + timestamp;
+            String attachmentMessage = "[attachment]" + attachmentId + "|"+ sender + "|" + fileName + "|" + file.getAbsolutePath() + "|unread|" + mimeType;
 
             redisCommands.rpush(messageKey, attachmentMessage);
             redisCommands.rpush(reverseKey, attachmentMessage);
 			
-           // DFSUtil.storeMessage(sender, recipient, attachmentMessage);
+            DFSUtil.storeMessage(sender, recipient, attachmentMessage);
 			NotificationServlet.addNotification(sender, recipient, "[Attachment=> " + fileName + "]", attachmentId);
 		}
 		else {
-			String message = messageId + ": " + sender + ": " + text + ": " + "unread" + ": " + timestamp;
+			String message = messageId + ": " + sender + ": " + text + ": " + "unread";
 			redisCommands.rpush(messageKey, message);
 			redisCommands.rpush(reverseKey, message);
 			
-			//DFSUtil.storeMessage(messageId, sender, recipient, text, "unread");
+			DFSUtil.storeMessage(messageId, sender, recipient, text, "unread");
 			NotificationServlet.addNotification(sender, recipient, text, messageId);
 
 			response.setStatus(HttpServletResponse.SC_OK);
