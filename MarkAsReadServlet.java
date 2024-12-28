@@ -67,7 +67,6 @@ public class MarkAsReadServlet extends HttpServlet {
 					DFSUtil.updateMessageStatusInFile(sender, recipient, messageId, attachmentId, "read");
 				}
 				
-				NotificationServlet.removeNotification(sender, messageId);
 				response.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				List<String> senderMessages = redisCommands.lrange(senderKey, 0, -1);
@@ -100,7 +99,6 @@ public class MarkAsReadServlet extends HttpServlet {
 					DFSUtil.updateMessageStatusInFile(sender, recipient, messageId, attachmentId, "read");
 				}
 				
-				NotificationServlet.removeNotification(sender, messageId);
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
 		} catch (Exception e) {

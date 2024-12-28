@@ -17,7 +17,6 @@ public class RemoveGroupNotificationServlet extends HttpServlet {
         String messageId = removeGroupNotification.messageId;
         String email = (String) request.getSession().getAttribute("email");
 		
-		System.out.println(email + "dsnfk " + messageId + "ed " + groupId);
         if (email == null || groupId == null || messageId == null) {
 			System.out.println("Invalid data: email=" + email + ", groupId=" + groupId + ", messageId=" + messageId);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -29,6 +28,7 @@ public class RemoveGroupNotificationServlet extends HttpServlet {
 		String groupMembersKey = "group:" + groupId.split(":")[0] + ":" + groupId;
         List<String> groupMembers = redisCommands.lrange(groupMembersKey, 0, -1);
 		System.out.println(groupMembers);
+		
         for (String member : groupMembers) {
             String notificationKey = "notifications:" + member;
             List<String> notifications = redisCommands.lrange(notificationKey, 0, -1);

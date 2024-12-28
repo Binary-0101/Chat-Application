@@ -19,7 +19,6 @@ public class AddMembersServlet extends HttpServlet {
             return;
         }
         
-        // Filter users not in the group
         Map<String, String> nonGroupUsers = new HashMap<>();
         for (Map.Entry<String, String> user : allUsers.entrySet()) {
             if (!groupMembers.contains(user.getValue())) {

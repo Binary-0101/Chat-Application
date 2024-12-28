@@ -107,11 +107,12 @@
 		</button> 
     </div>
 
-    <script>
+    <script>		
 		function fetchNotifications() {
             $.ajax({
                 url: 'NotificationServlet',
                 method: 'GET',
+				data: { action: 'fetchNotifications' },
                 dataType: 'json',
                 success: function (notifications) {
                     const notificationsContainer = $("#notifications");
@@ -122,14 +123,14 @@
                     } else {
                         notifications.forEach(function(notification) {
                             let notificationHtml = '';
-                            if (notification.length === 3) {
+                            if (notification.length === 4) {
                                 notificationHtml = 
-                                    '<div class="notification-item" onclick="markAsReadAndOpenChat(\'' + notification[1] + '\', \'' + notification[0] + '\')">' +
+                                    '<div class="notification-item" onclick="openChat(\'' + notification[1] + '\', \'' + notification[0] + '\', \'' + notification[3] + '\')">' + 
                                     '<strong>' + notification[1] + '</strong>: ' + notification[2] +
                                     '</div>';
                             } else {
                                 notificationHtml = 
-                                    '<div class="notification-item" onclick="markAsReadAndOpenChat(\'' + notification[3] + '\', \'' + notification[2] + '\', \'' + notification[0] + ':' + notification[1] + '\')">' +
+                                    '<div class="notification-item" onclick="openChat(\'' + notification[3] + '\', \'' + notification[2] + '\', \'' + notification[0] + ':' + notification[1] + '\')">' +
                                     '<strong>' + notification[0] + '</strong>: ' + notification[3] + ' : ' + notification[4] +
                                     '</div>';
                             }
@@ -143,32 +144,26 @@
             });
         }
 
-        function markAsReadAndOpenChat(sender, messageId, groupId) {
-			console.log(groupId);
-			
+        function openChat(sender, messageId, recipient, groupId) {
+			console.log(messageId, groupId, recipient);
+			$.ajax({
+				url: 'NotificationServlet',
+				method: 'POST',
+				 data: { recipient, messageId, groupId },
+				 success: function(response) {
+					console.log("Notification marked as read.");
+					},
+					error: function(err) {
+						console.error('Error marking notification as read:', err);
+					}
+			});
+				
 			if(!groupId) {
-				console.log("markasread called");
-				fetch("markAsRead", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ recipient: sender, messageId })
-				}).catch(err => {
-					console.error("Error marking as read:", err);
-				});
+				window.location.href = "startchat.jsp?recipient=" + sender;
 			} else {
-				console.log("removeGroupNotification called");
-				console.log(groupId, "hkjd" + messageId);
-					fetch("removeGroupNotification", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ groupId, messageId })
-				}).catch(err => {
-					console.error("Error removing group notification:", err);
-				});
 				window.location.href = "startchat.jsp?groupId=" + "group:" + groupId;
 				return;
 			}
-			window.location.href = "startchat.jsp?recipient=" + sender;
         }
 		
 		setInterval(fetchNotifications, 1000);

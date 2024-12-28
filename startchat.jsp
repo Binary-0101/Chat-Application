@@ -314,7 +314,7 @@
 						if (statusElement) {
 							const status = msg.readStatus === "read" ? '✔️✔️' : '✔️';
 							if (statusElement.textContent !== status) {
-								statusElement.textContent = status; // Update read status
+								statusElement.textContent = status;
 							}
 						}
 					}
@@ -412,9 +412,8 @@
 				const statusSpan = document.createElement("span");
                 statusSpan.className = "status";
                 statusSpan.textContent = status;
-				 messageDiv.appendChild(statusSpan);
+				messageDiv.appendChild(statusSpan);
 
-				
 				if(msg.type === "sent" && msg.text !== "null" && !msg.text.includes("[attachment]")) {
 					const editButton = document.createElement("button");
 					editButton.textContent = "Edit";

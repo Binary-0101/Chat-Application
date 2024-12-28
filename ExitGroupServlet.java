@@ -33,8 +33,10 @@ public class ExitGroupServlet extends HttpServlet {
 			return;
         }
 		
+		List<String> groupMembers = redisCommands.lrange(redisGroupKey, 0, -1);
+		
 		redisCommands.lrem(redisGroupKey, 1, email);
-		//DFSUtil.updateGroupFile(redisGroupKey, groupName, email);
+		DFSUtil.storeGroup(redisGroupKey, groupName, groupMembers);
 		
 		response.setContentType("text/plain"); 
         response.getWriter().write("You have successfully exited the group: " + groupName);

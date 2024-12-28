@@ -213,7 +213,11 @@
     <nav>
         <ul>
             <li><a href="createGroup.jsp">Create Group Chat</a></li>
-            <li><a href="notification.jsp">Notifications</a></li>
+            <li>
+				<a href="notification.jsp">
+					Notifications  <span id="notification-count" style="color: red; font-weight: bold;">0</span>
+				</a>
+			</li>
             <li><a href="SignOutServlet">Sign Out</a></li>
         </ul>
     </nav>
@@ -253,64 +257,96 @@
     </div>
 	
 	<script>
-    $(document).ready(function () {
-        let displayedGroups = new Set(); 
+	
+		  let lastNotificationCount = 0;
+		
+			function fetchNotificationCount() {
+				$.ajax({
+				url: 'NotificationServlet',
+				method: 'GET',
+				data: { action: 'fetchCount' },
+				dataType: 'json',
+				success: function (data) {
+					const unreadCount = data.unreadCount;
+					const notificationBadge = document.getElementById("notification-count");
+					if (unreadCount > 0) {
+						notificationBadge.textContent = unreadCount;
+						notificationBadge.style.display = "block";
+					} else {
+						notificationBadge.style.display = "none";
+					}
+					if (unreadCount > lastNotificationCount) {
+						//const notificationSound = new Audio('notification.mp3');
+						//notificationSound.play();
+				    }
+				lastNotificationCount = unreadCount;
+			},
+			error: function (err) {
+				console.error('Error fetching notification count:', err);
+			}
+		});
+	 }
+		
+	setInterval(fetchNotificationCount, 1000);
+		
+		$(document).ready(function () {
+			let displayedGroups = new Set(); 
 
-        function fetchGroups() {
-            $.ajax({
-                url: 'FetchGroupsServlet',
-                method: 'GET',
-                dataType: 'json',
-                success: function (groups) {
-                    console.log("Groups fetched from backend:", groups);
-                    const groupsContainer = $("#group-container");
+			function fetchGroups() {
+				$.ajax({
+					url: 'FetchGroupsServlet',
+					method: 'GET',
+					dataType: 'json',
+					success: function (groups) {
+						console.log("Groups fetched from backend:", groups);
+						const groupsContainer = $("#group-container");
 
-                    const noGroupsMessage = groupsContainer.find('.no-users-message');
-                    if (noGroupsMessage.length > 0 && groups.length > 0) {
-                        noGroupsMessage.remove();
-                    }
+						const noGroupsMessage = groupsContainer.find('.no-users-message');
+						if (noGroupsMessage.length > 0 && groups.length > 0) {
+							noGroupsMessage.remove();
+						}
 
-                    if (groups.length > 0 && !groupsContainer.find('h2').length) {
-                        groupsContainer.prepend('<h2>Your Groups</h2>');
-                    }
+						if (groups.length > 0 && !groupsContainer.find('h2').length) {
+							groupsContainer.prepend('<h2>Your Groups</h2>');
+						}
 
-                    groups.forEach(group => {
-                        console.log("Processing group:", group);
-						console.log("group-id", group.groupId);
-						console.log("group-name", group.groupName);
-                        if (!displayedGroups.has(group.groupId)) { 
-                            displayedGroups.add(group.groupId); 
-							const groupName = group.groupName;
-                            const groupHtml = 
-                                '<div class="group-container">' +
-                                    '<p>' + group.groupName + '</p>' +
-                                    '<form action="startchat.jsp" method="post">' +
-                                        '<input type="hidden" name="groupId" value="' +  group.groupId + '">' +
-                                        '<button type="submit">Chat</button>' +
-                                    '</form>' +
-                                '</div>'; 
-								
-							if (!groupsContainer.find('[data-group-id="' + group.groupId + '"]').length) {
-								groupsContainer.append(groupHtml);
+						groups.forEach(group => {
+							console.log("Processing group:", group);
+							console.log("group-id", group.groupId);
+							console.log("group-name", group.groupName);
+							if (!displayedGroups.has(group.groupId)) { 
+								displayedGroups.add(group.groupId); 
+								const groupName = group.groupName;
+								const groupHtml = 
+									'<div class="group-container">' +
+										'<p>' + group.groupName + '</p>' +
+										'<form action="startchat.jsp" method="post">' +
+											'<input type="hidden" name="groupId" value="' +  group.groupId + '">' +
+											'<button type="submit">Chat</button>' +
+										'</form>' +
+									'</div>'; 
+									
+								if (!groupsContainer.find('[data-group-id="' + group.groupId + '"]').length) {
+									groupsContainer.append(groupHtml);
+								}
 							}
-                        }
-                    });
+						});
 
-                    if (displayedGroups.size === 0 && !groupsContainer.find('.no-users-message').length) {
-                        groupsContainer.html('<p class="no-users-message">No groups found.</p>');
-                    }
+						if (displayedGroups.size === 0 && !groupsContainer.find('.no-users-message').length) {
+							groupsContainer.html('<p class="no-users-message">No groups found.</p>');
+						}
 
-                    if (displayedGroups.size === 0 && groupsContainer.find('h2').length) {
-                        groupsContainer.find('h2').remove();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Failed to fetch groups:", error, xhr.responseText); 
-                }
-            });
-        }
-		setInterval(fetchGroups, 500);
-    });
+						if (displayedGroups.size === 0 && groupsContainer.find('h2').length) {
+							groupsContainer.find('h2').remove();
+						}
+					},
+					error: function (xhr, status, error) {
+						console.error("Failed to fetch groups:", error, xhr.responseText); 
+					}
+				});
+			}
+			setInterval(fetchGroups, 500);
+		});
 </script>
 </body>
 </html>
